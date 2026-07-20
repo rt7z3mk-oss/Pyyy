@@ -5,14 +5,12 @@ on:
     branches:
       - master
       - main
-
   workflow_dispatch:
 
 env:
   BUILD_NUMBER: 1
   BUILD_VERSION: 1.0.0
-  PYTHON_VERSION: 3.11
-  FLUTTER_VERSION: 3.22.2
+  PYTHON_VERSION: '3.11'
 
 jobs:
   build-apk:
@@ -27,33 +25,22 @@ jobs:
       with:
         python-version: ${{ env.PYTHON_VERSION }}
 
-    - name: Install Python Dependencies
+    - name: Install Dependencies
       run: |
         python -m pip install --upgrade pip
-        python -m pip install flet
         python -m pip install -r requirements.txt
-        python -m flet --version
 
-    - name: Setup Flutter
-      uses: subosito/flutter-action@v2
-      with:
-        flutter-version: ${{ env.FLUTTER_VERSION }}
-
-    - name: Setup Java JDK
-      uses: actions/setup-java@v4
-      with:
-        distribution: temurin
-        java-version: '21'
-
-    - name: Build APK
+    - name: Build APK with Flet
       run: |
-        flutter config --no-analytics
-        python -m flet build apk --verbose --build-number=$BUILD_NUMBER --build-version=$BUILD_VERSION
+        python -m flet build apk \
+          --verbose \
+          --build-number=${{ env.BUILD_NUMBER }} \
+          --build-version=${{ env.BUILD_VERSION }}
 
     - name: Upload APK
       uses: actions/upload-artifact@v4
+      if: success()
       with:
         name: apk-build-artifact
         path: build/apk
         if-no-files-found: warn
-        overwrite: false
