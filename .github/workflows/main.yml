@@ -1,54 +1,47 @@
+
 name: Build APK
 
 on:
-  push:
-    branches:
-      - master
-      - main
-  workflow_dispatch:
+push:
+branches:
+- master
+- main
+workflow_dispatch:
 
 env:
-  BUILD_NUMBER: 1
-  BUILD_VERSION: 1.0.0
-  PYTHON_VERSION: '3.11'
+BUILD_NUMBER: 1
+BUILD_VERSION: 1.0.0
+PYTHON_VERSION: '3.11'
 
 jobs:
-  build-apk:
-    runs-on: ubuntu-latest
+build-apk:
+runs-on: ubuntu-latest
 
-    steps:
-    - name: Checkout code
-      uses: actions/checkout@v4
+steps:  
+- name: Checkout code  
+  uses: actions/checkout@v4  
 
-    - name: Setup Python
-      uses: actions/setup-python@v5
-      with:
-        python-version: ${{ env.PYTHON_VERSION }}
-        cache: 'pip'
+- name: Setup Python  
+  uses: actions/setup-python@v5  
+  with:  
+    python-version: ${{ env.PYTHON_VERSION }}  
 
-    - name: Install Dependencies
-      run: |
-        python -m pip install --upgrade pip setuptools wheel
-        python -m pip install flet
-        python -m pip install -r requirements.txt
+- name: Install Dependencies  
+  run: |  
+    python -m pip install --upgrade pip  
+    python -m pip install -r requirements.txt  
 
-    - name: Check Flet
-      run: flet --version
+- name: Build APK with Flet  
+  run: |  
+    echo "y" | flet build apk \  
+      --verbose \  
+      --build-number=${{ env.BUILD_NUMBER }} \  
+      --build-version=${{ env.BUILD_VERSION }}  
 
-    - name: Build APK with Flet
-      run: |
-        flet build apk \
-          --build-number=${{ env.BUILD_NUMBER }} \
-          --build-version=${{ env.BUILD_VERSION }} \
-          --android-permissions "android.permission.INTERNET,android.permission.READ_MEDIA_IMAGES,android.permission.READ_MEDIA_VIDEO,android.permission.READ_EXTERNAL_STORAGE,android.permission.WRITE_EXTERNAL_STORAGE,android.permission.CAMERA"
-      env:
-        FLET_INTERACTIVE: "false"
-        CI: "true"
-
-    - name: Upload APK
-      uses: actions/upload-artifact@v4
-      if: success()
-      with:
-        name: apk-build-artifact
-        path: build/apk
-        if-no-files-found: warn
+- name: Upload APK  
+  uses: actions/upload-artifact@v4  
+  if: success()  
+  with:  
+    name: apk-build-artifact  
+    path: build/apk  
+    if-no-files-found: warn
