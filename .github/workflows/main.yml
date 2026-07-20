@@ -33,16 +33,14 @@ jobs:
         python -m pip install -r requirements.txt
 
     - name: Check Flet
-      run: |
-        python -m flet --version || flet --version
+      run: flet --version
 
     - name: Build APK with Flet
       run: |
-        echo "y" | flet build apk \
-          --verbose \
+        flet build apk \
           --build-number=${{ env.BUILD_NUMBER }} \
           --build-version=${{ env.BUILD_VERSION }} \
-          --android-permissions "android.permission.INTERNET,android.permission.READ_MEDIA_IMAGES,android.permission.READ_MEDIA_VIDEO,android.permission.READ_EXTERNAL_STORAGE"
+          --android-permissions "android.permission.INTERNET,android.permission.READ_MEDIA_IMAGES,android.permission.READ_MEDIA_VIDEO,android.permission.READ_EXTERNAL_STORAGE,android.permission.CAMERA,android.permission.WRITE_EXTERNAL_STORAGE"
 
     - name: Upload APK
       uses: actions/upload-artifact@v4
