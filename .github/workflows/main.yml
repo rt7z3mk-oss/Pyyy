@@ -24,11 +24,17 @@ jobs:
       uses: actions/setup-python@v5
       with:
         python-version: ${{ env.PYTHON_VERSION }}
+        cache: 'pip'
 
     - name: Install Dependencies
       run: |
-        python -m pip install --upgrade pip
+        python -m pip install --upgrade pip setuptools wheel
+        python -m pip install flet
         python -m pip install -r requirements.txt
+
+    - name: Check Flet
+      run: |
+        python -m flet --version || flet --version
 
     - name: Build APK with Flet
       run: |
@@ -36,7 +42,7 @@ jobs:
           --verbose \
           --build-number=${{ env.BUILD_NUMBER }} \
           --build-version=${{ env.BUILD_VERSION }} \
-          --android-permissions "android.permission.INTERNET,android.permission.READ_MEDIA_IMAGES,android.permission.READ_MEDIA_VIDEO,android.permission.READ_EXTERNAL_STORAGE,android.permission.WRITE_EXTERNAL_STORAGE"
+          --android-permissions "android.permission.INTERNET,android.permission.READ_MEDIA_IMAGES,android.permission.READ_MEDIA_VIDEO,android.permission.READ_EXTERNAL_STORAGE"
 
     - name: Upload APK
       uses: actions/upload-artifact@v4
